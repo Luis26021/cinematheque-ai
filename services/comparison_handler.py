@@ -1,31 +1,34 @@
 import os
-from groq import Groq
+from services.groq_client import call_groq, GroqRateLimitError
 from services.tmdb import search_films_by_query
+from services.i18n import t
 from base_prompts import get_full_system_prompt, COMPARISON_AGENT_CONTEXT
+from logger_config import get_logger
+
+logger = get_logger(__name__)
+
 
 def compare_films(film_titles: list, language: str = "it") -> dict:
     """Confronta due o più film
-    
+
     Args:
         film_titles: Lista titoli film da confrontare
         language: Lingua risposta (it/en/es/fr/de)
     """
-    
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    
+
     # Cerca tutti i film
     films = []
     for title in film_titles:
         results = search_films_by_query(title, limit=1)
         if results:
             films.append(results[0])
-    
+
     if len(films) < 2:
         return {
             "text": "Non ho trovato abbastanza film per fare un confronto. Dammi almeno due titoli.",
             "films": []
         }
-    
+
     # Genera confronto
     films_info = "\n\n".join([
         f"FILM {i+1}: {f['title']} ({f['year']})\n"
@@ -36,14 +39,12 @@ def compare_films(film_titles: list, language: str = "it") -> dict:
         f"Director: {f.get('director', 'N/A')}"
         for i, f in enumerate(films)
     ])
-    
-    # System prompt from base_prompts
+
     system_prompt = get_full_system_prompt(
         language=language,
         context=COMPARISON_AGENT_CONTEXT
     )
-    
-    # User prompt (only specific comparison instructions)
+
     user_prompt = f"""Compare these films and help the user choose:
 
 {films_info}
@@ -64,18 +65,22 @@ FOLLOW-UP QUESTION (MANDATORY):
   * "Do you prefer open endings or definitive conclusions?"
 - The question should help the user decide or explore further
 """
-    
-    response = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        max_tokens=600,
-        temperature=0.7
-    )
-    
-    return {
-        "text": response.choices[0].message.content,
-        "films": films
-    }
+
+    try:
+        response = call_groq(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            max_tokens=600,
+            temperature=0.7
+        )
+
+        return {
+            "text": response.choices[0].message.content,
+            "films": films
+        }
+
+    except GroqRateLimitError:
+        logger.warning("Rate limited in compare_films")
+        return {"text": t("rate_limited", language), "films": films}

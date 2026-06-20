@@ -16,6 +16,7 @@ TRANSLATIONS = {
         "generating": "Generando suggerimenti personalizzati...",
         "comparing": "Confronto i film...",
         "searching_info": "Cerco informazioni su {title}...",
+        "rate_limited": "Il servizio è momentaneamente sovraccarico. Riprova tra qualche secondo.",
         
         # UI labels
         "welcome_title": "Cinémathèque",
@@ -45,7 +46,8 @@ TRANSLATIONS = {
         "generating": "Generating personalized suggestions...",
         "comparing": "Comparing films...",
         "searching_info": "Searching info about {title}...",
-        
+        "rate_limited": "The service is temporarily overloaded. Please try again in a few seconds.",
+
         # UI labels
         "welcome_title": "Cinémathèque",
         "welcome_subtitle": "Your personal film curator",
@@ -74,7 +76,8 @@ TRANSLATIONS = {
         "generating": "Generando sugerencias personalizadas...",
         "comparing": "Comparando películas...",
         "searching_info": "Buscando información sobre {title}...",
-        
+        "rate_limited": "El servicio está temporalmente sobrecargado. Por favor, inténtalo de nuevo en unos segundos.",
+
         # UI labels
         "welcome_title": "Cinémathèque",
         "welcome_subtitle": "Tu curador de cine personal",
@@ -103,7 +106,8 @@ TRANSLATIONS = {
         "generating": "Génération de suggestions personnalisées...",
         "comparing": "Comparaison des films...",
         "searching_info": "Recherche d'informations sur {title}...",
-        
+        "rate_limited": "Le service est temporairement surchargé. Veuillez réessayer dans quelques secondes.",
+
         # UI labels
         "welcome_title": "Cinémathèque",
         "welcome_subtitle": "Votre curateur de films personnel",
@@ -132,7 +136,8 @@ TRANSLATIONS = {
         "generating": "Generiere personalisierte Vorschläge...",
         "comparing": "Vergleiche Filme...",
         "searching_info": "Suche Informationen über {title}...",
-        
+        "rate_limited": "Der Dienst ist vorübergehend überlastet. Bitte versuche es in ein paar Sekunden erneut.",
+
         # UI labels
         "welcome_title": "Cinémathèque",
         "welcome_subtitle": "Dein persönlicher Filmkurator",

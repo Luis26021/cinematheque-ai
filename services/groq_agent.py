@@ -1,16 +1,14 @@
-import os
 import json
-from groq import Groq
-from dotenv import load_dotenv
+from services.groq_client import call_groq, GroqRateLimitError
 from services.tools import TOOLS, execute_tool
+from logger_config import get_logger
 
-load_dotenv()
+logger = get_logger(__name__)
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def get_film_suggestion(user_message: str, history: list) -> dict:
     """Chiama Groq con function calling per suggerimento film"""
-    
+
     system_prompt = """Sei un esperto consigliere di film. Aiuti le persone a scegliere cosa guardare.
 
 HAI ACCESSO A QUESTI TOOLS:
@@ -46,56 +44,51 @@ User: "Film di fantascienza recenti"
         *[{"role": m["role"], "content": m["content"]} for m in history],
         {"role": "user", "content": user_message}
     ]
-    
+
     try:
         # Initial call to Groq with tools
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+        response = call_groq(
             messages=messages,
             tools=TOOLS,
             tool_choice="auto",
             max_tokens=2048,
             temperature=0.7
         )
-        
+
         response_message = response.choices[0].message
         tool_calls = response_message.tool_calls
-        
+
         # If no tool calls, return direct response
         if not tool_calls:
             return {
                 "text": response_message.content or "Non ho trovato nulla di rilevante.",
                 "films": []
             }
-        
+
         # Execute tool calls
         messages.append(response_message)
-        
+
         all_films = []
         for tool_call in tool_calls:
             function_name = tool_call.function.name
             function_args = json.loads(tool_call.function.arguments)
-            
+
             print(f"Calling tool: {function_name} with args: {function_args}")
-            
-            # Execute tool
+
             tool_result = execute_tool(function_name, function_args)
             all_films.extend(tool_result.get("films", []))
-            
-            # Add tool result to messages
+
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
                 "name": function_name,
                 "content": json.dumps(tool_result)
             })
-        
-        # CAMBIA SYSTEM PROMPT per seconda chiamata
-        # Rimuovi il vecchio system prompt
+
+        # Remove old system prompt, add synthesis prompt
         messages_for_final = [m for m in messages if m.get("role") != "system"]
-        
-        # Aggiungi nuovo system prompt senza tools
-        final_system_prompt = """Sei un esperto consigliere di film. 
+
+        final_system_prompt = """Sei un esperto consigliere di film.
 
 Hai appena ricevuto una lista di film di qualità (rating >= 6.0).
 
@@ -109,32 +102,37 @@ REGOLE:
 """
 
         messages_for_final.insert(0, {"role": "system", "content": final_system_prompt})
-        
+
         # Second call WITHOUT tools
-        second_response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+        second_response = call_groq(
             messages=messages_for_final,
             max_tokens=1024,
             temperature=0.7
         )
-        
+
         assistant_text = second_response.choices[0].message.content
-        
+
         # Extract mentioned films
         mentioned_films = []
         for film in all_films:
             if film["title"].lower() in assistant_text.lower():
                 mentioned_films.append(film)
-        
-        # If no films mentioned but we have results, include top 3
+
         if not mentioned_films and all_films:
             mentioned_films = all_films[:3]
-        
+
         return {
             "text": assistant_text,
             "films": mentioned_films[:3]
         }
-    
+
+    except GroqRateLimitError:
+        logger.warning("Rate limited in get_film_suggestion")
+        return {
+            "text": "Il servizio è momentaneamente sovraccarico. Riprova tra qualche secondo.",
+            "films": []
+        }
+
     except Exception as e:
         print(f"Error in get_film_suggestion: {e}")
         import traceback

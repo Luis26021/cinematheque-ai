@@ -1,34 +1,38 @@
 # LLM-Based Query Analysis - Replace Regex Hell
 
-import os
 import json
-from groq import Groq
-from dotenv import load_dotenv
+from services.groq_client import call_groq, GroqRateLimitError
+from logger_config import get_logger
 
-load_dotenv()
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+logger = get_logger(__name__)
+
 
 def analyze_query_with_llm(user_message: str, response_language: str = "it", history: list = None):
     """
     Estrae parametri di ricerca usando LLM invece di regex
-    
+
     Vantaggi:
     - Robusto a variazioni linguistiche
     - Multi-lingua automatico
     - No false positive
     - Meno codice
     """
-    
+
+    tmdb_language_map = {
+        "it": "it-IT", "en": "en-US", "es": "es-ES",
+        "fr": "fr-FR", "de": "de-DE"
+    }
+
     # Conversation context
     is_repeat_request = False
     previous_platform = None
-    
+
     if history and len(history) > 0:
         # Pattern repeat
         repeat_patterns = ['altri', 'ancora', 'more', 'another', 'diversi', 'dammene']
         if any(p in user_message.lower() for p in repeat_patterns):
             is_repeat_request = True
-            
+
             # Estrai platform dall'ultimo messaggio
             for msg in reversed(history):
                 if msg.get('role') == 'assistant':
@@ -39,7 +43,7 @@ def analyze_query_with_llm(user_message: str, response_language: str = "it", his
                             previous_platform = p
                             break
                     break
-    
+
     # LLM Extraction Prompt
     extraction_prompt = f"""Extract search parameters from this film request. Return ONLY valid JSON.
 
@@ -81,7 +85,7 @@ Output: {{"platform": null, "genres": ["comedy"], "year": null, "year_range": nu
 Input: "film con valutazione alta"
 Output: {{"platform": null, "genres": [], "year": null, "year_range": null, "rating_min": 7.5, "mood": null}}
 
-CRITICAL: 
+CRITICAL:
 - Return ONLY the JSON object, no markdown, no explanation
 - If a parameter is not mentioned, use null or []
 - Be precise with platform names (exact match from list)
@@ -91,37 +95,30 @@ Now extract from: "{user_message}"
 """
 
     try:
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+        response = call_groq(
             messages=[{"role": "user", "content": extraction_prompt}],
             max_tokens=200,
-            temperature=0.1  # Low temperature for structured output
+            temperature=0.1
         )
-        
+
         result_text = response.choices[0].message.content.strip()
-        
+
         # Remove markdown fences if present
         if result_text.startswith("```"):
             result_text = result_text.split("```")[1]
             if result_text.startswith("json"):
                 result_text = result_text[4:]
             result_text = result_text.strip()
-        
-        import json
-        
+
         # Parse JSON
         params = json.loads(result_text)
-        
+
         print(f"DEBUG - LLM extracted params: {params}")
-        
+
         # Map to TMDB format
         country_code = "IT"
-        tmdb_language_map = {
-            "it": "it-IT", "en": "en-US", "es": "es-ES", 
-            "fr": "fr-FR", "de": "de-DE"
-        }
         tmdb_language = tmdb_language_map.get(response_language, "it-IT")
-        
+
         # Genre mapping
         genre_map = {
             "action": [28],
@@ -138,20 +135,20 @@ Now extract from: "{user_message}"
             "documentary": [99],
             "mystery": [9648]
         }
-        
+
         # Build args
         args = {
             "limit": 10,
             "country": country_code,
             "tmdb_language": tmdb_language
         }
-        
+
         # Platform
         if params.get("platform"):
             args["platform_filter"] = params["platform"]
         elif is_repeat_request and previous_platform:
             args["platform_filter"] = previous_platform.title()
-        
+
         # Genres
         if params.get("genres"):
             genre_ids = []
@@ -159,29 +156,29 @@ Now extract from: "{user_message}"
                 genre_ids.extend(genre_map.get(g, []))
             if genre_ids:
                 args["genre_ids"] = list(set(genre_ids))
-        
+
         # Year
         if params.get("year"):
             args["year"] = params["year"]
-        
+
         # Year range
         if params.get("year_range"):
             args["year_range"] = params["year_range"]
-        
+
         # Rating
         if params.get("rating_min"):
             args["rating_min"] = params["rating_min"]
-        
+
         # Mood → urgency → recent years
         if params.get("mood") == "urgent":
             args["year_range"] = [2020, 2026]
-        
+
         # Repeat request offset
         if is_repeat_request:
             import random
             args["offset"] = random.randint(5, 20)
             print(f"DEBUG - Repeat request: offset={args['offset']}")
-        
+
         # Decide tool
         if "genre_ids" in args or "year" in args or "year_range" in args:
             tool = "search_films"
@@ -189,14 +186,25 @@ Now extract from: "{user_message}"
             tool = "search_films"
         else:
             tool = "get_popular_films"
-        
+
         return {"tool": tool, "args": args}
-    
+
+    except GroqRateLimitError:
+        logger.warning("Rate limited during query analysis, defaulting to get_popular_films")
+        return {
+            "tool": "get_popular_films",
+            "args": {
+                "limit": 10,
+                "country": "IT",
+                "tmdb_language": tmdb_language_map.get(response_language, "it-IT")
+            }
+        }
+
     except Exception as e:
         print(f"ERROR in LLM extraction: {e}")
         import traceback
         traceback.print_exc()
-        
+
         # Fallback to safe defaults
         return {
             "tool": "get_popular_films",

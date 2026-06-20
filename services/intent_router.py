@@ -1,13 +1,12 @@
-import os
-from groq import Groq
-from dotenv import load_dotenv
+from services.groq_client import call_groq, GroqRateLimitError
+from logger_config import get_logger
 
-load_dotenv()
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+logger = get_logger(__name__)
+
 
 def detect_intent(user_message: str) -> dict:
     """Rileva l'intent della query utente"""
-    
+
     prompt = f"""Analizza questa richiesta e classifica l'intent:
 
 RICHIESTA: "{user_message}"
@@ -36,27 +35,29 @@ Rispondi SOLO con un JSON:
 
 Dove entities contiene titoli di film menzionati (se presenti).
 """
-    
+
     try:
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+        response = call_groq(
             messages=[{"role": "user", "content": prompt}],
             max_tokens=150,
             temperature=0.3
         )
-        
+
         import json
         result_text = response.choices[0].message.content.strip()
-        
+
         # Rimuovi markdown se presente
         if result_text.startswith("```json"):
             result_text = result_text.split("```json")[1].split("```")[0].strip()
-        
+
         result = json.loads(result_text)
         print(f"DEBUG - Intent detected: {result}")
         return result
-    
+
+    except GroqRateLimitError:
+        logger.warning("Rate limited during intent detection, defaulting to recommendation")
+        return {"intent": "recommendation", "entities": []}
+
     except Exception as e:
         print(f"Error in intent detection: {e}")
-        # Fallback: assume recommendation
         return {"intent": "recommendation", "entities": []}

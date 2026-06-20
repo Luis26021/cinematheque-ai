@@ -166,6 +166,11 @@ Explain WHY each film fits their request.
 Mention streaming platforms when available.
 Ask questions to refine taste."""
 
+FILMOGRAPHY_AGENT_CONTEXT = """You are discussing the filmography of a specific director or actor.
+Be conversational and passionate, not like a database readout.
+Connect films to each other to show career arcs and recurring themes.
+Vary your phrasing — never use the same formula for each film."""
+
 CULT_FILMS_GENERATOR_CONTEXT = """You are generating a list of cult classic films.
 
 DEFINITION OF CULT FILMS:
