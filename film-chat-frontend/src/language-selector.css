@@ -1,0 +1,102 @@
+/* ─────────────────────────────────────────────────────────────
+   Language Selector - Stile identico ai nav-link
+   ───────────────────────────────────────────────────────────── */
+
+/* Divider tra nav items */
+.nav-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--hair);
+  align-self: center;
+}
+
+/* Container */
+.language-selector {
+  position: relative;
+}
+
+/* Trigger - IDENTICO a .nav-link */
+.language-trigger {
+  background: none;
+  border: 0;
+  padding: 4px 0 6px;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+
+.language-trigger:hover {
+  color: var(--ink);
+}
+
+.language-trigger:focus {
+  outline: none;
+  color: var(--ink);
+}
+
+/* Menu dropdown */
+.language-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  
+  min-width: 140px;
+  padding: 8px;
+  
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  box-shadow: 0 4px 16px rgba(26, 20, 16, 0.1);
+  
+  animation: dropdown-appear 0.2s ease;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Menu item */
+.language-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink);
+  text-align: left;
+  
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.language-item:hover {
+  background: rgba(26, 20, 16, 0.04);
+}
+
+.language-item.is-current {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .language-selector {
+    display: none; /* Hidden su mobile come gli altri nav */
+  }
+}

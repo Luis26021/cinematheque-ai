@@ -1,0 +1,12 @@
+# Add to your requirements.txt
+
+# Rate limiting
+slowapi==0.1.9
+
+# Existing dependencies (keep these)
+fastapi
+uvicorn
+python-dotenv
+requests
+groq
+# ... rest of your deps

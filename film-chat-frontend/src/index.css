@@ -1,0 +1,32 @@
+/* Cinémathèque base — riempie il body, niente bordi attorno alla "chat-container" */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #efe9dd;
+  color: #1a1410;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "ss02";
+}
+
+code, pre, kbd {
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+}
+
+/* Selection in brand red */
+::selection {
+  background: #952b22;
+  color: #f7f3ea;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cdc4b3; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #b0a78f; }

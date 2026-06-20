@@ -1,0 +1,677 @@
+/* ─────────────────────────────────────────────────────────────
+   Cinémathèque · App.css
+   Editorial system — cream paper, deep ink, deep red accent.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --bg:        #efe9dd;
+  --paper:    #f7f3ea;
+  --ink:      #1a1410;
+  --ink-soft: #2c241d;
+  --muted:    #6b6359;
+  --hair:     #cdc4b3;
+  --hair-strong: #b3a98f;
+  --accent:   #952b22;
+  --accent-soft: #b54a3c;
+  --success:  #4a6b3a;
+
+  --serif:  'Newsreader', Georgia, 'Times New Roman', serif;
+  --sans:   'DM Sans', system-ui, -apple-system, sans-serif;
+  --mono:   'JetBrains Mono', Menlo, monospace;
+
+  --gutter: 92px;
+  --content-max: 760px;
+  --page-pad: clamp(20px, 4vw, 56px);
+}
+
+/* ───────────────────────── App shell ───────────────────────── */
+
+.app {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───────────────────────── Masthead ─────────────────────────── */
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--hair);
+}
+
+.masthead-inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 26px var(--page-pad) 18px;
+}
+
+.brand-mark {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: italic;
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.brand-dot {
+  color: var(--accent);
+  font-style: normal;
+}
+
+.brand-tag {
+  margin-top: 5px;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.masthead-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  background: none;
+  border: 0;
+  padding: 4px 0 6px;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.nav-link:hover { color: var(--ink); }
+.nav-link.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+/* ───────────────────────── Conversation ─────────────────────── */
+
+.conversation {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.conversation-inner {
+  padding: 32px var(--page-pad) 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ───────────────────────── Turn ─────────────────────────────── */
+
+.turn {
+  display: grid;
+  grid-template-columns: var(--gutter) 1fr;
+  gap: 28px;
+  animation: fade-in .35s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.turn-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  padding-top: 8px;
+}
+.turn-label--accent {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.turn-body {
+  max-width: var(--content-max);
+}
+
+/* ─────────────────── User quote ─────────────────────────────── */
+
+.user-quote {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(18px, 2.1vw, 22px);
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+/* ─────────────────── Agent trace ────────────────────────────── */
+
+.agent-trace {
+  margin-bottom: 16px;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  font-style: italic;
+  padding-left: 0;
+}
+
+.trace-line {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  animation: fade-in .25s ease-out;
+}
+
+.trace-glyph {
+  color: var(--accent);
+  font-style: normal;
+  min-width: 12px;
+}
+
+.trace-line--result .trace-glyph { color: var(--success); }
+.trace-line--status .trace-glyph { color: var(--muted); }
+
+.trace-tool {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink);
+  font-style: normal;
+  background: var(--paper);
+  padding: 1px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--hair);
+}
+
+.trace-text {
+  color: var(--muted);
+}
+
+/* ─────────────────── Thinking indicator ─────────────────────── */
+
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--muted);
+  padding: 4px 0;
+}
+
+.thinking-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.7); }
+}
+
+/* ─────────────────── Curator prose ──────────────────────────── */
+
+.curator-prose {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.curator-prose p { margin: 0 0 12px; }
+.curator-prose p:last-child { margin-bottom: 0; }
+.curator-prose strong { font-weight: 600; color: var(--ink); }
+.curator-prose em { font-style: italic; color: var(--accent); }
+.curator-prose a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-soft);
+}
+.curator-prose a:hover { border-bottom-color: var(--accent); }
+.curator-prose ul, .curator-prose ol { margin: 8px 0 12px; padding-left: 24px; }
+.curator-prose li { margin: 4px 0; }
+.curator-prose blockquote {
+  margin: 12px 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* Drop cap — solo quando il messaggio porta dei film */
+.curator-prose.with-drop-cap > p:first-child::first-letter {
+  float: left;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 62px;
+  line-height: 0.85;
+  margin: 6px 10px 0 0;
+  color: var(--accent);
+}
+
+.curator-prose.is-error {
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* ─────────────────── Film list ──────────────────────────────── */
+
+.film-list {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+
+.film-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 16px;
+}
+
+.film-list-title {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.film-list-meta {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.film-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 22px 18px;
+}
+
+/* ─────────────────── Film card ──────────────────────────────── */
+
+.film-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.film-poster {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: #1a1410;
+  box-shadow:
+    0 8px 18px rgba(26, 20, 16, 0.16),
+    0 1px 0 rgba(26, 20, 16, 0.18);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s;
+}
+
+.film-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+}
+
+.film-card:hover .film-poster {
+  transform: translateY(-3px);
+  box-shadow:
+    0 14px 28px rgba(26, 20, 16, 0.22),
+    0 1px 0 rgba(26, 20, 16, 0.2);
+}
+.film-card:hover .film-poster img {
+  transform: scale(1.04);
+}
+
+.film-poster-fallback {
+  width: 100%; height: 100%;
+  display: grid; place-items: center;
+  padding: 18px;
+  background: linear-gradient(160deg, #2c241d 0%, #1a1410 100%);
+  color: var(--paper);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.film-no {
+  position: absolute;
+  top: 8px; left: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 2px 8px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.film-title {
+  display: block;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+  text-decoration: none;
+  margin-top: 4px;
+  transition: color .15s;
+}
+.film-title:hover {
+  color: var(--accent);
+}
+
+.film-meta {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.film-year {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.film-rating {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.film-genres {
+  margin-top: 2px;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.film-streaming {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hair);
+}
+
+.streaming-label {
+  font-family: var(--sans);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.streaming-label--muted {
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-family: var(--serif);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.streaming-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.platform-badge {
+  width: 30px; height: 30px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  transition: transform .15s, border-color .15s;
+  display: block;
+}
+.platform-badge:hover {
+  transform: scale(1.1);
+  border-color: var(--ink);
+}
+.platform-badge img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.platform-badge > span {
+  font-family: var(--mono);
+  font-size: 9px;
+  display: grid;
+  place-items: center;
+  width: 100%; height: 100%;
+  color: var(--ink);
+  padding: 2px;
+  text-align: center;
+}
+
+/* ─────────────────── Welcome ────────────────────────────────── */
+
+.welcome {
+  display: grid;
+  grid-template-columns: var(--gutter) 1fr;
+  gap: 28px;
+  padding: 28px 0 16px;
+}
+
+.welcome-eyebrow {
+  grid-column: 1 / -1;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hair);
+  margin-bottom: 8px;
+}
+
+.welcome-title {
+  grid-column: 2 / -1;
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.welcome-title em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.welcome-lede {
+  grid-column: 2 / -1;
+  margin: 18px 0 28px;
+  max-width: 560px;
+  font-family: var(--serif);
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.welcome-prompts {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+  max-width: 760px;
+}
+
+.prompt-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: transparent;
+  border: 1px solid var(--hair);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.prompt-chip:hover {
+  background: var(--paper);
+  border-color: var(--ink);
+}
+
+.prompt-no {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  min-width: 22px;
+}
+
+.prompt-text {
+  flex: 1;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.prompt-arrow {
+  font-family: var(--sans);
+  color: var(--accent);
+  font-size: 16px;
+}
+
+/* ─────────────────── Composer ───────────────────────────────── */
+
+.composer {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  border-top: 1px solid var(--hair);
+  z-index: 5;
+}
+
+.composer-inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px var(--page-pad) 22px;
+}
+
+.composer-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 72px;
+}
+
+.composer-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  padding: 6px 0 8px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(16px, 1.5vw, 19px);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s;
+}
+.composer-input::placeholder {
+  color: var(--muted);
+  font-style: italic;
+}
+.composer-input:focus {
+  border-bottom-color: var(--accent);
+}
+.composer-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.composer-submit {
+  background: none;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  padding: 10px 20px;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+.composer-submit:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--bg);
+}
+.composer-submit:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ─────────────────── Responsive ─────────────────────────────── */
+
+@media (max-width: 720px) {
+  :root { --gutter: 0px; --page-pad: 20px; }
+
+  .turn {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .turn-label { padding-top: 0; }
+
+  .welcome { grid-template-columns: 1fr; }
+  .welcome-eyebrow, .welcome-title, .welcome-lede, .welcome-prompts {
+    grid-column: 1 / -1;
+  }
+  .welcome-prompts { grid-template-columns: 1fr; }
+
+  .masthead-nav { display: none; }
+
+  .composer-inner { gap: 12px; padding: 14px var(--page-pad) 16px; }
+  .composer-label { min-width: 0; font-size: 9px; }
+  .composer-submit { padding: 9px 14px; }
+
+  .film-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .curator-prose.with-drop-cap > p:first-child::first-letter {
+    font-size: 52px;
+  }
+}
